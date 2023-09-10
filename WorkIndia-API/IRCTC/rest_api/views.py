@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from irctcBase.models import User, Train
-from .serializers import UserSerializer, TrainSerializer
+from .serializers import UserSerializer, TrainSerializer, TrainSearchSerializer
 
 
 class RegisterView(APIView):
@@ -46,7 +46,18 @@ class LoginView(APIView):
 
 class TrainView(APIView):
     def post(self, request):
-        items = Train.objects.all()
-        serializer = TrainSerializer(items, many=True)
-        return Response({"message": "Train added successfully",
-"train_id": ""})
+        serializer = TrainSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Train added successfully", "train_id": ""})
+        
+        return Response({'errors': 'Serializer Failed', 'status_code':404}, status=404)
+
+class TrainFetchView(APIView):
+    def get(self, request):
+        source = self.request.query_params.get('source','')
+        destination = self.request.query_params.get('destination','')
+        # destination = request.data['destination']
+        train_av = Train.objects.filter(source = source, destination = destination)
+        serializer = TrainSearchSerializer(train_av, many=True)
+        return Response(serializer.data, status = 200)

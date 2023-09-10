@@ -25,5 +25,10 @@ class UserSerializer(serializers.ModelSerializer):
         
 class TrainSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = Train
         fields = '__all__'
+
+class TrainSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Train
+        fields = ['train_name', 'seat_capacity']
